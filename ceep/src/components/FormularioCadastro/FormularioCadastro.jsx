@@ -5,6 +5,24 @@ class FormularioCadastro extends Component {
     super(props);
     this.titulo = "";
     this.texto = "";
+    this.categoria = "Sem Categoria";
+
+    this.state = { categorias: []};
+
+    this._novasCatergorias = this._novasCatergorias.bind(this);
+
+  }
+
+  componentDidMount(){
+    this.props.categorias.inscrever(this._novasCatergorias);
+  }
+
+  componentWillUnmount(){
+    this.props.categorias.desinscrever(this._novasCatergorias);
+  }
+
+  _novasCatergorias(categorias){
+    this.setState({...this.state, categorias});
   }
 
   _handleMundancaTitulo(evento) {
@@ -14,20 +32,32 @@ class FormularioCadastro extends Component {
 
   _handleMundancaTexto(evento) {
     evento.stopPropagation();
-    this.texto = evento.target.value;
+    this.texto = evento.target.value; 
   }
 
-  _criarNota(evento){
+  _handleMundancaCategoria(evento) {
+    evento.stopPropagation();
+    this.categoria = evento.target.value;
+  }
+
+  _criarNota(evento) {
     evento.preventDefault();
     evento.stopPropagation();
-    this.props.criarNota(this.titulo, this.texto)
+    this.props.criarNota(this.titulo, this.texto, this.categoria);
   }
 
   render() {
     return (
-      <form className="form-cadastro "
-        onSubmit={this._criarNota.bind(this)}
-      >
+      <form className="form-cadastro " onSubmit={this._criarNota.bind(this)}>
+        <select 
+          className="form-cadastro_input"
+          onChange={this._handleMundancaCategoria.bind(this)}
+        >
+          <option>Sem Categoria</option>
+          {this.state.categorias.map((categoria, index) => {
+            return <option key={index}>{categoria}</option>;
+          })}
+        </select>
         <input
           type="text"
           placeholder="Título"
